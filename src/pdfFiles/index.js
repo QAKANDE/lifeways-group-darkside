@@ -5,30 +5,43 @@ const pdf = require("html-pdf");
 const path = require("path");
 const puppeteer = require("puppeteer");
 const { createReadStream, readFile } = require("fs-extra")
+var cloudinary = require('cloudinary').v2;
+const fs = require("fs-extra")
+const fileSchema = require("../pdfFiles/schema")
+CLOUDINARY_URL =  process.env.CLOUDINARY_URL
+  cloudinary.config({ 
+  cloud_name: 'quadri', 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET_KEY 
+  });
+let students = []
+  
 
-router.post("/pdf", (req, res) => {
-
-  let students = []
-  const receiveDetailsFromFrontend = {
-            morning: req.body.morning,
-            afternoon: req.body.afternoon,
-            night: req.body.night,
-            choices: req.body.choices,
-            special: req.body.special,
-            health: req.body.health,
-            changeInSupport: req.body.changeInSupport,
-            actionIfYesToChangeInSupport: req.body.actionIfYesToChangeInSupport,
-            serviceUsername: req.body.serviceUsername,
-            currentDate: new Date().toDateString(),
-            staffName : req.body.staffName
+router.post("/pdf", async (req, res, next) => {
+  try {
+    const receiveDetailsFromFrontend = {
+    morning: req.body.morning,
+    afternoon: req.body.afternoon,
+    night: req.body.night,
+    choices: req.body.choices,
+    special: req.body.special,
+    health: req.body.health,
+    changeInSupport: req.body.changeInSupport,
+    actionIfYesToChangeInSupport: req.body.actionIfYesToChangeInSupport,
+    serviceUsername: req.body.serviceUsername,
+    currentDate: new Date().toDateString(),
+    staffName: req.body.staffName ,
+    id : req.body.id
   }
-  students.push(receiveDetailsFromFrontend)
-  const pdfTitle = students[0].serviceUsername + " " +  new Date().toDateString()
-     ejs.renderFile(path.join(__dirname, './views/', "report-template.ejs"), {students : students }, (err, data) => {
+    students.push(receiveDetailsFromFrontend)
+    const pdfTitle = students[0].serviceUsername + " " + new Date().toDateString()
+    const pdfURL = path.join(__dirname, 'files', pdfTitle + '.pdf');
+        ejs.renderFile(path.join(__dirname, './views/', "report-template.ejs"), {students : students }, (err, data) => {
     if (err) {
         console.log(err)
     } else {
-        let options = {
+      let options = {
+			"directory": pdfURL,
             "height": "11.25in",
             "width": "8.5in",
             "header": {
@@ -37,17 +50,47 @@ router.post("/pdf", (req, res) => {
             "footer": {
                 "height": "20mm",
             },
-        };
-        pdf.create(data, options).toFile(`${pdfTitle}.pdf`, function (err, data) {
+      };
+        pdf.create(data).toBuffer(function (err, data) {
             if (err) {
                 console.log(err)
             } else {
-                res.send("File created successfully");
+              try {
+                const uploadStream = (fileBuffer, options) => {
+          try {
+            return new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream({ public_id: `${pdfTitle}`}, (error, result) => {
+            if (error) {
+            reject(error);
+            } else {
+            resolve(result);
+            console.log(result.url)
+            }
+        }).end(fileBuffer);
+      });
+            
+          } catch (error) {
+            console.log(error)
+            
+          }
+}     
+           uploadStream(data, { public_id: `${pdfTitle}`});
+                
+              } catch (error) {
+                console.log(error)
+                
+              }
+
             }
         });
+ 
     }
-});
+     });
 
+    
+  } catch (error) {
+    console.log(error)
+  }
 })
 
 // router.post("/pdf/", async (req, res) => {
