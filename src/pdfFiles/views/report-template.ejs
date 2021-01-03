@@ -1,0 +1,96 @@
+<head>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+       @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600&display=swap');
+        .header , span , h3   {
+            font-family: 'Montserrat', sans-serif;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        div {
+              font-family: 'Montserrat', sans-serif;
+            margin-top: 2rem;
+        }
+        .text{
+            font-family: 'Roboto', sans-serif;
+            
+        }
+    </style>
+</head>
+
+<body>
+    <div style="width: 85%; margin: 0 7.5%;">
+        <div style="padding-left: 50px;">
+            <div>
+                <span>
+                    <%= students[0].serviceUsername %>
+                </span>
+                <span style="margin-left: 23rem;">
+                    <%= students[0].currentDate %>
+                </span>
+            </div>
+            <div style="margin-top: 1rem;">
+                Completed by : <%= students[0].staffName %>
+            </div>
+            <h3 style="text-align:center ;">Daily Diary</h5>
+                <div>
+                        <% if (students.length> 0) { %>
+                               <p>
+                                   <p class="header">About my morning</p> 
+                                   <p class="text">
+                                       <%= students[0].morning %>
+                                   </p>
+                               </p> 
+                            <p>
+                            <p class="header">About my afternoon</p>
+                            <p class="text">
+                                    <%= students[0].afternoon %>
+                               </p> 
+                            </p>
+                            <p>
+                            <p class="header">About my night</p>
+                            <p class="text">
+                                <%= students[0].night %>
+                            </p>
+                            </p>
+                            <p>
+                                <p class="header">What choices have i made today ?</p>
+                            <p class="text">
+                                    <%= students[0].choices %>
+                            </p>
+                            </p>
+                            <p>
+                                <p class="header">Did I do something special ?</p>
+                        <p class="text">
+                                <%= students[0].special %>
+                            </p>
+                            </p>
+                            <p>
+                            <p class="header">About my health</p>
+                            <p class="text">
+
+                                <%= students[0].health %>
+                            </p>
+                            </p>
+                            <p>
+                            <p class="header">Does anything need to change in how you support me or my plan ?</p>
+                        <p class="text">
+                                <%= students[0].changeInSupport %>
+                            </p>
+                            </p>
+                            <p>
+                                <p class="header">If yes to above question , what action has been taken ?</p>
+                            <p class="text">
+
+                                    <%= students[0].actionIfYesToChangeInSupport %>
+                                </p>
+                            </p>
+                              
+                                    <% }%>
+                   
+                </div>
+        </div>
+    </div>
+</body>
+
+</html>
