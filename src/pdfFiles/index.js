@@ -5,9 +5,10 @@ const pdf = require("html-pdf");
 const path = require("path");
 const puppeteer = require("puppeteer");
 const { createReadStream, readFile } = require("fs-extra")
-var cloudinary = require('cloudinary').v2;
+const cloudinary = require('cloudinary').v2;
 const fs = require("fs-extra")
 const fileSchema = require("../pdfFiles/schema")
+const objectId = require('mongodb').ObjectID;
 CLOUDINARY_URL =  process.env.CLOUDINARY_URL
   cloudinary.config({ 
   cloud_name: 'quadri', 
@@ -19,6 +20,7 @@ let students = []
 
 router.post("/pdf", async (req, res, next) => {
   try {
+    const url = []
     const receiveDetailsFromFrontend = {
     morning: req.body.morning,
     afternoon: req.body.afternoon,
@@ -34,7 +36,7 @@ router.post("/pdf", async (req, res, next) => {
     id : req.body.id
   }
     students.push(receiveDetailsFromFrontend)
-    const pdfTitle = students[0].serviceUsername + " " + new Date().toDateString()
+    const pdfTitle = students[0].serviceUsername + new Date().toDateString()
     const pdfURL = path.join(__dirname, 'files', pdfTitle + '.pdf');
         ejs.renderFile(path.join(__dirname, './views/', "report-template.ejs"), {students : students }, (err, data) => {
     if (err) {
@@ -51,43 +53,45 @@ router.post("/pdf", async (req, res, next) => {
                 "height": "20mm",
             },
       };
-        pdf.create(data).toBuffer(function (err, data) {
+      pdf.create(data).toBuffer( async function (err, data) {
             if (err) {
                 console.log(err)
             } else {
-              try {
-                const uploadStream = (fileBuffer, options) => {
-          try {
-            return new Promise((resolve, reject) => {
-            cloudinary.uploader.upload_stream({ public_id: `${pdfTitle}`}, (error, result) => {
-            if (error) {
-            reject(error);
-            } else {
-            resolve(result);
-            console.log(result.url)
-            }
-        }).end(fileBuffer);
-      });
-            
-          } catch (error) {
-            console.log(error)
-            
-          }
-}     
-           uploadStream(data, { public_id: `${pdfTitle}`});
-                
+            const uploadStream =   (fileBuffer, options) => {
+              return new Promise((resolve, reject) => {
+              try {          
+                cloudinary.uploader.upload_stream(options, (error, result) => {
+                  if (result) {
+                    resolve(result)
+                    url.push(result.url)
+                    console.log(result.url)
+                  }
+                  else {
+                    console.log(error)
+                  }
+          }).end(fileBuffer);
               } catch (error) {
                 console.log(error)
                 
               }
-
-            }
+      });
+}     
+              await uploadStream(data, { public_id: `${pdfTitle}` });
+              try {
+              
+                const files = new fileSchema();
+                files._id = objectId(students[0].id)
+                files.fileUrl = url[0]
+  const newPdf = await files.save();
+  res.send(newPdf)
+              } catch (error) {
+                console.log(error)
+              }
+            } 
         });
  
     }
-     });
-
-    
+     });  
   } catch (error) {
     console.log(error)
   }

@@ -5,7 +5,8 @@ const { authenticate, refreshToken, generateToken } = require ("../staff/authToo
 const { authorize } = require("../../services/middlewares/authorize")
 const { application, json, Router } = require("express");
 const serviceUsers = require ("../service-users/schema")
-
+const sgMail = require('@sendgrid/mail')
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 router.get("/", async (req, res, next) => {
   try {
@@ -38,7 +39,7 @@ try {
     res.send (serviceUsersPerHouse)
         } 
         else {
-            res.send("Staff Token Not Used , Redirect To Token Check Page")
+            res.send("Token Not Authenticated")
         }
     }
     else {
@@ -71,7 +72,22 @@ router.post("/register", async (req, res, next) => {
         const selected = staffTokenArray.slice(0, 5);
          req.body = {...req.body , staffToken : selected.sort().join("") }  
     const newUser = new profileModel(req.body);
-    const { _id } = await newUser.save();
+      const { _id } = await newUser.save();
+             const msg = {
+  to: req.body.email, // Change to your recipient
+  from: "u1945140@uel.ac.uk", // Change to your verified sender
+  subject: 'Lifeways Group',
+  text: `Hello ${req.body.firstName} , here's your access token ${selected.sort().join("")}`,
+  html: `<strong>Hello ${req.body.firstName} , here's your access token ${selected.sort().join("")}</strong>`,
+          }
+   sgMail
+  .send(msg)
+  .then(() => {
+    console.log('Email sent')
+  })
+  .catch((error) => {
+    console.error(error)
+  })
     res.status(201).send(_id);
   } catch (error) {
     next(error);
@@ -120,7 +136,7 @@ router.post("/login", async (req, res, next) => {
 
     if (user) {
     res.setHeader("Content-Type" , "application/json")
-        res.send(tokens)
+      res.send(tokens)
     }
   } catch (error) {
     next(error);

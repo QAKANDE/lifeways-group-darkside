@@ -7,6 +7,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser")
 const path = require("path")
 const tasks = require("./tasks/index")
+const adminToken = require("./admin/index")
 
 // var token = require("crypto").randomBytes(48).toString("hex");
 // console.log(token);
@@ -22,7 +23,8 @@ server.use(express.static(path.join(__dirname, '..', 'public')));
 server.use("/serviceusers", serviceUsers)
 server.use("/staff" , staffMembers)
 server.use("/files", files)
-server.use("/tasks" , tasks)
+server.use("/tasks", tasks)
+server.use("/adminToken" , adminToken)
 console.log("Endpoints : ", listEndpoints(server));
 
 

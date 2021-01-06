@@ -36,11 +36,15 @@ const profileSchema = new Schema(
       type: String,
       required: true,
       minlength: 7,
-         } , 
-        staffToken: {
-            type: String,
-            required : true
-        },
+    },
+    staffToken: {
+      type: String,
+      required: true
+    },
+    tokenProvidedByAdmin: {
+      type: String, 
+      require: true
+    },
         houseName: {
             type: String,
             required : true
