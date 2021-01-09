@@ -59,16 +59,21 @@ router.get("/tasksAllocation", async (req, res) => {
     weeklyTasks.tasks.task5.push(fifthTask)
     weeklyTasks.tasks.task6.push(sixthTask)
     weeklyTasks.tasks.task7.push(seventhTask)
-    await weeklyTasks.save()
+    res.send(await weeklyTasks.save())
 })
     
 router.get("/getTasks", async (req, res) => {
+    const taskArray = []
     const dt = new Date() 
     const diff = dt.getDate() - dt.getDay() + (dt.getDay() === 0 ? -6 : 1);
     const startOfWeek = new Date(dt.setDate(diff));
-    const alltasks = await tasksSchema.findById("5ff52299bc14c66fbcbe0ce0")
-    // const eachWeek = alltasks.filter((each => each.weekCommencingDate === startOfWeek))
+    const alltasks = await tasksSchema.find()
+    taskArray.push(alltasks)
     console.log(alltasks)
+    const week = taskArray.filter(each => each._id === "5ff52299bc14c66fbcbe0ce0")
+    // const eachWeek = alltasks.filter((each => each.weekCommencingDate === startOfWeek))
+    console.log(week)
+    
 })
 
 module.exports = router

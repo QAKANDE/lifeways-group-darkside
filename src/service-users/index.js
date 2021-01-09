@@ -27,7 +27,6 @@ router.post("/register", async (req, res, next) => {
   try {
     const newUser = new serviceUsersModel(req.body);
     const { _id } = await newUser.save();
-    console.log(newUser._id);
     res.status(201).send(_id);
   } catch (error) {
     next(error);

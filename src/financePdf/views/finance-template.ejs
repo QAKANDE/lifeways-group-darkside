@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        table {
+            border-collapse: collapse;
+            margin-left: 3rem;
+        }
+        td {
+            border: 1px solid black;
+            padding-top: 0.5rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+       
+    </style>
+</head>
+
+<body>
+    <div style="width: 85%; margin: 0 7.5%;">
+        <div style="text-align: center; padding-left: 50px;">
+            <h3>Finance Report</h5>
+                <div>
+                    <span>
+                        <%= finances[0].serviceUsername %>
+                    </span>
+                    <span style="margin-left: 23rem;">
+                    <%= finances[finances.length - 1].monthAndYear %>      
+                    </span>
+                </div>
+                <table>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Expenditure</th>
+                        <th>Balance</th>
+                    </tr>
+                    <% if (finances.length> 0) { %>
+                        <% finances.forEach(finance=> {%>
+                            <tr>
+                                <td>
+                                    <%= finance.date %>
+                                </td>
+                                <td>
+                                    <%= finance.description %>
+                                </td>
+                                <td>
+                                    <%= finance.expenditure %>
+                                </td>
+                                <td>
+                                    <%=finance.balance %>
+                                </td>
+                            </tr>
+                            <% });%>
+                                <% }%>
+                </table>
+        </div>
+    </div>
+</body>
+
+</html>

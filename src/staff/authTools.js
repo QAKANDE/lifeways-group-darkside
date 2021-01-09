@@ -29,9 +29,6 @@ const generateJWT = (payload) =>
 
 const verifyJWT = (token) =>
   new Promise((res, rej) => {
-    // console.log('*****************************************************************')
-    // console.log(token)
-    // console.log(process.env.SECRET_KEY)
     jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
       if (err) rej(err);
       res(decoded);
